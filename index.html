@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpendIQ — Team Finance Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div style="position:relative">
+
+<!-- ══ AUTH SCREEN ══ -->
+<div class="screen show" id="authScreen">
+  <div class="auth-wrap" style="min-height:640px">
+    <div class="auth-left">
+      <div class="auth-left-bg"></div>
+      <div class="auth-left-bg2"></div>
+      <div class="brand-auth">
+        <div class="brand-icon">💸</div>
+        <div>
+          <div class="brand-auth-name">Spend<span>IQ</span></div>
+          <div style="font-size:10px;color:var(--t3);letter-spacing:0.04em">Team Finance Intelligence</div>
+        </div>
+      </div>
+      <div class="auth-hero">
+        <div class="auth-hero-tag">✦ Built for winning teams</div>
+        <div class="auth-hero-title">Know where every<br><span>rupee goes</span></div>
+        <div class="auth-hero-sub">SpendIQ turns messy team expenses into clear insights, smart alerts, and one-tap settlements.</div>
+        <div class="auth-features">
+          <div class="auth-feat"><div class="feat-dot"></div>Real-time budget tracking across categories</div>
+          <div class="auth-feat"><div class="feat-dot"></div>AI-powered overspend warnings</div>
+          <div class="auth-feat"><div class="feat-dot"></div>Auto-calculated split & settle up</div>
+          <div class="auth-feat"><div class="feat-dot"></div>Visual analytics — donut, bar, trend charts</div>
+          <div class="auth-feat"><div class="feat-dot"></div>Export to CSV in one click</div>
+        </div>
+      </div>
+      <div class="auth-stats">
+        <div><div class="auth-stat-val">₹2.4L</div><div class="auth-stat-lbl">tracked today</div></div>
+        <div><div class="auth-stat-val">98%</div><div class="auth-stat-lbl">accuracy</div></div>
+        <div><div class="auth-stat-val">5s</div><div class="auth-stat-lbl">to add expense</div></div>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Sign in</button>
+          <button class="auth-tab" id="signupTab" onclick="switchAuthTab('signup')">Create account</button>
+        </div>
+        <div id="loginForm">
+          <div class="auth-form-title">Welcome back</div>
+          <div class="auth-form-sub">Sign in to your SpendIQ workspace</div>
+          <div class="auth-err" id="loginErr"></div>
+          <div class="field">
+            <label class="field-label">Email</label>
+            <div class="field-wrap">
+              <span class="field-icon">✉</span>
+              <input class="field-input" id="lEmail" type="email" placeholder="you@team.com">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-wrap">
+              <span class="field-icon">🔒</span>
+              <input class="field-input" id="lPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:-8px;margin-bottom:16px">
+            <span style="font-size:11px;color:var(--p3);cursor:pointer">Forgot password?</span>
+          </div>
+          <button class="auth-btn" onclick="doLogin()">Sign in to SpendIQ →</button>
+          <div class="auth-divider"><div class="auth-divider-line"></div><span>or</span><div class="auth-divider-line"></div></div>
+          <button class="auth-demo" onclick="demoLogin()">Try demo workspace (no signup needed)</button>
+          <div class="auth-terms">By signing in you agree to our Terms of Service and Privacy Policy</div>
+        </div>
+        <div id="signupForm" style="display:none">
+          <div class="auth-form-title">Join SpendIQ</div>
+          <div class="auth-form-sub">Create your team workspace in 30 seconds</div>
+          <div class="auth-err" id="signupErr"></div>
+          <div class="team-pill"><span class="team-pill-icon">👥</span>You'll be the workspace admin. Invite teammates after setup.</div>
+          <div class="field-row" style="margin-bottom:14px">
+            <div class="field">
+              <label class="field-label">First name</label>
+              <div class="field-wrap"><span class="field-icon">👤</span><input class="field-input" id="sFirst" placeholder="Arjun"></div>
+            </div>
+            <div class="field">
+              <label class="field-label">Last name</label>
+              <div class="field-wrap"><span class="field-icon">👤</span><input class="field-input" id="sLast" placeholder="Kumar"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Work email</label>
+            <div class="field-wrap"><span class="field-icon">✉</span><input class="field-input" id="sEmail" type="email" placeholder="arjun@company.com"></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Team / workspace name</label>
+            <div class="field-wrap"><span class="field-icon">🏢</span><input class="field-input" id="sTeam" placeholder="e.g. Goa Sprint, Design Team"></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-wrap"><span class="field-icon">🔒</span><input class="field-input" id="sPass" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)"></div>
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill" style="width:0"></div></div>
+            <div id="strengthLabel" style="font-size:10px;color:var(--t3);margin-top:3px"></div>
+          </div>
+          <button class="auth-btn" onclick="doSignup()">Create workspace →</button>
+          <div class="auth-terms">Free forever for small teams. No credit card needed.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP SCREEN ══ -->
+<div class="screen" id="appScreen">
+  <nav class="nav">
+    <div class="brand">
+      <div class="brand-icon-sm">💸</div>
+      <div class="brand-nm">Spend<span>IQ</span></div>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="goTo('dashboard',this)">Dashboard</button>
+      <button class="nav-tab" onclick="goTo('add',this)">+ Add</button>
+      <button class="nav-tab" onclick="goTo('analytics',this)">Analytics</button>
+      <button class="nav-tab" onclick="goTo('settle',this)">Settle Up</button>
+      <button class="nav-tab" onclick="goTo('team',this)">Team</button>
+    </div>
+    <div class="nav-right">
+      <div class="bpill">
+        <div class="alert-pulse" id="alertDot" style="display:none"></div>
+        <div class="bpill-bar"><div class="bpill-fill" id="bFill"></div></div>
+        <span id="bPct" style="font-size:11px;font-weight:600;font-family:var(--mono)"></span>
+      </div>
+      <div class="user-pill" id="userPill">
+        <div class="u-avatar" id="uAvatar">AK</div>
+        <span id="uName">Arjun</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+      <button style="background:var(--p);border:none;color:#fff;padding:6px 13px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)" onclick="exportCSV()">Export CSV</button>
+    </div>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="kpi-row" id="kpiRow"></div>
+    <div class="g13">
+      <div>
+        <div class="card">
+          <div class="card-hd"><div><div class="card-title">Category utilization</div><div class="card-sub">spend vs limit</div></div><div class="badge badge-p">Live</div></div>
+          <div id="catBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Recent transactions</div></div>
+            <input type="text" placeholder="Search..." id="searchInput" oninput="renderExpenses()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--t1);padding:6px 11px;border-radius:7px;font-size:11px;font-family:var(--font);outline:none;width:120px">
+          </div>
+          <div id="expenseList"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Spending breakdown</div></div>
+          <div style="position:relative;height:180px"><canvas id="donutChart"></canvas></div>
+          <div id="donutLeg" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title">7-day spend trend</div></div>
+          <div style="position:relative;height:150px"><canvas id="trendChart"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-hd"><div class="card-title">Smart insights</div><div class="badge badge-y">AI</div></div>
+          <div id="insightsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD EXPENSE -->
+  <div class="page" id="page-add">
+    <div style="max-width:520px;margin:0 auto">
+      <div style="margin-bottom:18px"><div style="font-size:20px;font-weight:700;margin-bottom:3px">Add expense</div><div style="font-size:12px;color:var(--t3)">Log a new team expense</div></div>
+      <div class="card">
+        <div class="field">
+          <label class="field-label">Description</label>
+          <div class="field-wrap"><span class="field-icon">📝</span><input class="field-input" id="fDesc" placeholder="e.g. AWS Server, Team Lunch"></div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Amount (₹)</label>
+            <div class="field-wrap"><span class="field-icon">₹</span><input class="field-input" id="fAmt" type="number" placeholder="0"></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Date</label>
+            <div class="field-wrap"><span class="field-icon">📅</span><input class="field-input" id="fDate" type="date"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Category</label>
+          <div id="catPicker" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:6px"></div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Paid by</label>
+            <div class="field-wrap">
+              <span class="field-icon">👤</span>
+              <select class="field-input" id="fPaidBy">
+                <option>Arjun</option><option>Priya</option><option>Riya</option><option>Dev</option><option>Neha</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Split</label>
+            <div class="field-wrap">
+              <span class="field-icon">➗</span>
+              <select class="field-input" id="fSplit">
+                <option value="all">All 5 members</option>
+                <option value="2">2 members</option>
+                <option value="3">3 members</option>
+                <option value="4">4 members</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <button class="sub-btn" onclick="addExpense()">Add expense →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="page" id="page-analytics">
+    <div class="g2">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-hd"><div class="card-title">Member spending</div><div class="badge badge-p">Bar</div></div>
+        <div style="position:relative;height:210px"><canvas id="memberBar"></canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="card-hd"><div class="card-title">Category distribution</div><div class="badge badge-y">Pie chart</div></div>
+        <div style="position:relative;height:210px"><canvas id="catPie"></canvas></div>
+      </div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-hd"><div class="card-title">30-day area trend</div></div>
+      <div style="position:relative;height:190px"><canvas id="areaChart"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hd"><div class="card-title">Budget health score</div><div id="scoreVal" style="font-size:24px;font-weight:800;font-family:var(--mono)"></div></div>
+      <div id="healthBars"></div>
+    </div>
+  </div>
+
+  <!-- SETTLE -->
+  <div class="page" id="page-settle">
+    <div style="max-width:520px;margin:0 auto">
+      <div style="margin-bottom:18px"><div style="font-size:20px;font-weight:700;margin-bottom:3px">Settle up</div><div style="font-size:12px;color:var(--t3)">Minimum transactions to clear all balances</div></div>
+      <div style="text-align:center;padding:16px;background:rgba(108,99,255,0.06);border:1px solid var(--border);border-radius:12px;margin-bottom:18px">
+        <div style="font-size:40px;font-weight:800;font-family:var(--mono);color:var(--teal)" id="settleCount">0</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:3px">optimal transactions needed</div>
+      </div>
+      <div id="settleList"></div>
+      <div class="card" style="margin-top:16px;margin-bottom:0">
+        <div class="card-hd"><div class="card-title">Individual balances</div></div>
+        <div id="balList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM -->
+  <div class="page" id="page-team">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div><div style="font-size:20px;font-weight:700">Team</div><div style="font-size:12px;color:var(--t3)" id="teamSub">5 members · Q2 2026</div></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;color:var(--t3)">Budget:</span>
+        <input type="range" id="budgetSlider" min="500000" max="3000000" step="50000" value="1500000" oninput="updateBudget(this.value)" style="width:90px">
+        <span id="budgetDisplay" style="font-size:12px;font-weight:600;font-family:var(--mono);color:var(--p3);min-width:46px"></span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px" id="memberGrid"></div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hd"><div class="card-title">Leaderboard</div><div class="badge badge-r">Ranked</div></div>
+      <div id="leaderboard"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
