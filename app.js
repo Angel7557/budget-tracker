@@ -175,4 +175,44 @@ function renderSettle(){
   const ph={};MEMBERS.forEach(m=>ph[m.name]=0);
   expenses.forEach(e=>{const n=e.split==='all'?5:parseInt(e.split);const sh=e.amt/n;ph[e.by]+=e.amt;MEMBERS.slice(0,n).forEach(m=>ph[m.name]-=sh);});
   const avg=Object.values(ph).reduce((a,b)=>a+b)/MEMBERS.length;Object.keys(ph).forEach(k=>ph[k]-=avg);
-  let pos=[...MEMBERS.filter(m=>ph[m.name]>1).map(m=>({...m,b:ph[m
+  let pos=[...MEMBERS.filter(m=>ph[m.name]>1).map(m=>({...m,b:ph[m.name]}))].sort((a,b)=>b.b-a.b);
+  let neg=[...MEMBERS.filter(m=>ph[m.name]<-1).map(m=>({...m,b:ph[m.name]}))].sort((a,b)=>a.b-b.b);
+  const txns=[];
+  while(pos.length&&neg.length){const f=neg[0],t=pos[0],a=Math.min(-f.b,t.b);if(a>1)txns.push({from:f.name,to:t.name,amt:Math.round(a),fc:f.color,tc:t.color,fi:f.init,ti:t.init,fb:f.bg,tb:t.bg});f.b+=a;t.b-=a;if(Math.abs(f.b)<1)neg.shift();if(Math.abs(t.b)<1)pos.shift();}
+  const pending=txns.filter(t=>!settledTxns.has(t.from+'→'+t.to));
+  document.getElementById('settleCount').textContent=pending.length;
+  document.getElementById('settleList').innerHTML=txns.map(t=>{const key=t.from+'→'+t.to,done=settledTxns.has(key);return`<div class="sr ${done?'done-txn':''}"><div style="display:flex;align-items:center;gap:6px"><div class="av" style="background:${t.fb};color:${t.fc};width:28px;height:28px;border-radius:7px;font-size:10px">${t.fi}</div><span style="font-size:12px;font-weight:600;color:var(--t2)">${t.from}</span></div><div style="flex:1;display:flex;align-items:center;gap:5px"><div class="arrow-line"></div><span style="font-size:10px;color:var(--t3)">owes</span><div class="arrow-line"></div></div><div style="display:flex;align-items:center;gap:6px"><div class="av" style="background:${t.tb};color:${t.tc};width:28px;height:28px;border-radius:7px;font-size:10px">${t.ti}</div><span style="font-size:12px;font-weight:600;color:var(--t2)">${t.to}</span></div><div class="settle-amt">${fmt(t.amt)}</div><button class="sb" onclick="markS('${key}',this)">${done?'Done':'Mark paid'}</button></div>`;}).join('')||'<div style="text-align:center;padding:20px;color:var(--t3);font-size:13px">All settled up!</div>';
+  const ph2={};MEMBERS.forEach(m=>ph2[m.name]=0);
+  expenses.forEach(e=>{const n=e.split==='all'?5:parseInt(e.split);const sh=e.amt/n;ph2[e.by]+=e.amt;MEMBERS.slice(0,n).forEach(m=>ph2[m.name]-=sh);});
+  const avg2=Object.values(ph2).reduce((a,b)=>a+b)/MEMBERS.length;Object.keys(ph2).forEach(k=>ph2[k]-=avg2);
+  document.getElementById('balList').innerHTML=MEMBERS.map(m=>{const b=Math.round(ph2[m.name]);return`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border2)"><div class="av" style="background:${m.bg};color:${m.color};width:28px;height:28px;border-radius:7px;font-size:10px;font-weight:700">${m.init}</div><div style="flex:1;font-size:12px;font-weight:600;color:var(--t1)">${m.name}</div><div style="font-size:13px;font-weight:700;font-family:var(--mono);color:${b>0?'#00d4aa':b<0?'#f43f5e':'#52527a'}">${b>0?'gets back '+fmt(b):b<0?'owes '+fmt(-b):'settled'}</div></div>`;}).join('');
+}
+function markS(key,btn){settledTxns.add(key);renderSettle();showToast('Payment marked as settled');}
+function renderTeam(){
+  const max=Math.max(...MEMBERS.map(m=>memSpent(m.name)));
+  document.getElementById('memberGrid').innerHTML=MEMBERS.map(m=>{const s=memSpent(m.name),top=s===max;return`<div class="mc ${top?'top':''}"> ${top?'<div class="top-badge">Top</div>':''}<div class="mav" style="background:${m.bg};color:${m.color}">${m.init}</div><div class="mn">${m.name}</div><div class="mv" style="color:${m.color}">${fmtL(s)}</div><div class="mc2">${expenses.filter(e=>e.by===m.name).length} expenses</div></div>`;}).join('');
+  const sorted=[...MEMBERS].sort((a,b)=>memSpent(b.name)-memSpent(a.name));
+  document.getElementById('leaderboard').innerHTML=sorted.map((m,i)=>{const s=memSpent(m.name);return`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border2)"><div style="font-size:14px;font-weight:700;min-width:20px;color:${i===0?'#ffa94d':i===1?'#9898c8':i===2?'#cd7f32':'var(--t3)'}">#${i+1}</div><div class="av" style="background:${m.bg};color:${m.color};width:32px;height:32px;border-radius:8px;font-size:11px;font-weight:700">${m.init}</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:3px">${m.name}</div><div style="height:5px;background:var(--bg5);border-radius:3px;overflow:hidden"><div style="height:5px;border-radius:3px;background:${m.color};width:${Math.round(s/max*100)}%"></div></div></div><div style="font-size:13px;font-weight:700;font-family:var(--mono);color:${m.color}">${fmtL(s)}</div></div>`;}).join('');
+  document.getElementById('budgetDisplay').textContent=fmtL(budget);
+}
+function updateBudget(v){budget=parseInt(v);document.getElementById('budgetDisplay').textContent=fmtL(budget);renderKPI();renderInsights();}
+function renderCatPicker(){
+  document.getElementById('catPicker').innerHTML=CATS.map(c=>`<div class="cat-opt ${selCat===c.name?'sel':''}" onclick="selCatFn('${c.name}')"><span style="font-size:18px">${c.icon}</span><span>${c.name}</span></div>`).join('');
+}
+function selCatFn(n){selCat=n;renderCatPicker();}
+function addExpense(){
+  const desc=document.getElementById('fDesc').value.trim(),amt=parseFloat(document.getElementById('fAmt').value),date=document.getElementById('fDate').value,by=document.getElementById('fPaidBy').value,split=document.getElementById('fSplit').value;
+  if(!desc||!amt||!date){showToast('Please fill all fields');return}
+  expenses.unshift({id:Date.now(),desc,cat:selCat,amt,date,by,split,status:'pending'});
+  document.getElementById('fDesc').value='';document.getElementById('fAmt').value='';
+  renderAll();goTo('dashboard',document.querySelectorAll('.nav-tab')[0]);showToast('Expense added successfully');
+}
+function exportCSV(){
+  const rows=[['Date','Description','Category','Amount','Paid By','Split','Status'],...expenses.map(e=>[e.date,e.desc,e.cat,e.amt,e.by,e.split,e.status])];
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));a.download='spendiq_export.csv';a.click();showToast('CSV exported successfully');
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function renderAll(){renderKPI();renderCatBars();renderExpenses();renderDonut();renderTrend();renderInsights();}
+
+document.getElementById('fDate').value=new Date().toISOString().slice(0,10);
+renderCatPicker();
